@@ -12,7 +12,7 @@ class EvaluationController extends Controller
 {
     public function index()
     {
-        $evaluations = Evaluation::with('eleve', 'cours')->latest('idEval')->paginate(15);
+        $evaluations = Evaluation::with('eleve', 'cours.classe')->latest('idEval')->paginate(15);
         return view('admin.evaluations.index', compact('evaluations'));
     }
 

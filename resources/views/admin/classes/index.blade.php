@@ -7,6 +7,7 @@
                 <tr>
                     <th class="px-4 py-3">Libellé</th>
                     <th class="px-4 py-3">Cycle</th>
+                    <th class="px-4 py-3">Section</th>
                     <th class="px-4 py-3 text-right">Actions</th>
                 </tr>
             </thead>
@@ -15,6 +16,9 @@
                     <tr>
                         <td class="px-4 py-3 font-medium">{{ $c->libelle }}</td>
                         <td class="px-4 py-3">{{ optional($c->cycle)->libelle ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs capitalize">{{ $c->section }}</span>
+                        </td>
                         <td class="px-4 py-3 text-right space-x-2">
                             <a href="{{ route('admin.classes.edit', $c) }}" class="text-sky-600 hover:underline">Éditer</a>
                             <form method="POST" action="{{ route('admin.classes.destroy', $c) }}" class="inline"
@@ -25,7 +29,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="px-4 py-6 text-center text-gray-500">Aucune classe.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Aucune classe.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -8,14 +8,24 @@
         <input type="text" name="libelle" value="{{ old('libelle', $classe->libelle) }}" required
                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
     </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Cycle</label>
-        <select name="idCycle" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-            <option value="">—</option>
-            @foreach ($cycles as $cy)
-                <option value="{{ $cy->idCycle }}" @selected(old('idCycle', $classe->idCycle) == $cy->idCycle)>{{ $cy->libelle }}</option>
-            @endforeach
-        </select>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Cycle</label>
+            <select name="idCycle" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                <option value="">—</option>
+                @foreach ($cycles as $cy)
+                    <option value="{{ $cy->idCycle }}" @selected(old('idCycle', $classe->idCycle) == $cy->idCycle)>{{ $cy->libelle }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Section *</label>
+            <select name="section" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                @foreach (\App\Support\Notation::SECTIONS as $key => $label)
+                    <option value="{{ $key }}" @selected(old('section', $classe->section ?? 'francophone') === $key)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
     <div class="flex gap-3">
         <button class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Enregistrer</button>

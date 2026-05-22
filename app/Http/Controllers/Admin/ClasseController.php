@@ -54,6 +54,7 @@ class ClasseController extends Controller
         return $r->validate([
             'libelle' => ['required', 'string', 'max:100'],
             'idCycle' => ['nullable', 'exists:cycles,idCycle'],
+            'section' => ['required', 'in:francophone,anglophone,bilingue'],
         ]);
     }
 }
