@@ -19,4 +19,14 @@ class Personne extends Model
     {
         return $this->hasOne(Enseignant::class, 'idPers', 'idPers');
     }
+
+    public function coursEnseignes()
+    {
+        return $this->hasMany(Cours::class, 'idPers', 'idPers');
+    }
+
+    public function parentEleves()
+    {
+        return $this->hasMany(ParentEleve::class, 'idPers', 'idPers');
+    }
 }

@@ -9,8 +9,14 @@ class Livre extends Model
     protected $primaryKey = 'idLivre';
     protected $guarded = [];
 
-    public function specialite()
+    protected $casts = [
+        'anneeEdition' => 'integer',
+        'quantiteTotal' => 'integer',
+        'quantiteDisponible' => 'integer',
+    ];
+
+    public function emprunts()
     {
-        return $this->belongsTo(Specialite::class, 'idSpecialite', 'idSpecialite');
+        return $this->hasMany(Emprunt::class, 'idLivre', 'idLivre');
     }
 }

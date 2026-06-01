@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('livres', function (Blueprint $table) {
             $table->id('idLivre');
-            $table->string('titre', 255);
-            $table->string('auteurs', 255)->nullable();
-            $table->float('prix')->default(0);
-            $table->unsignedBigInteger('idSpecialite')->nullable();
-            $table->string('edition', 255)->nullable();
-            $table->integer('annee_parution')->nullable();
-            $table->smallInteger('totalCopie')->default(0);
-            $table->unsignedBigInteger('idAdmin')->nullable();
+            $table->string('titre', 200);
+            $table->string('auteur', 150)->nullable();
+            $table->string('editeur', 100)->nullable();
+            $table->string('isbn', 20)->nullable()->unique();
+            $table->year('anneeEdition')->nullable();
+            $table->string('categorie', 80)->nullable();
+            $table->unsignedSmallInteger('quantiteTotal')->default(1);
+            $table->unsignedSmallInteger('quantiteDisponible')->default(1);
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

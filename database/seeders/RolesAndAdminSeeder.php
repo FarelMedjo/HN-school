@@ -14,7 +14,7 @@ class RolesAndAdminSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $roles = ['admin', 'enseignant', 'parent', 'eleve'];
+        $roles = ['admin', 'enseignant', 'parent', 'eleve', 'scolarite', 'finance'];
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
@@ -54,5 +54,23 @@ class RolesAndAdminSeeder extends Seeder
             ]
         );
         $eleve->syncRoles(['eleve']);
+
+        $scolarite = User::updateOrCreate(
+            ['email' => 'scolarite@hnschool.test'],
+            [
+                'name' => 'Scolarité Demo',
+                'password' => Hash::make('password'),
+            ]
+        );
+        $scolarite->syncRoles(['scolarite']);
+
+        $finance = User::updateOrCreate(
+            ['email' => 'finance@hnschool.test'],
+            [
+                'name' => 'Finance Demo',
+                'password' => Hash::make('password'),
+            ]
+        );
+        $finance->syncRoles(['finance']);
     }
 }

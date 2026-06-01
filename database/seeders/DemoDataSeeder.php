@@ -8,15 +8,20 @@ use App\Models\Cours;
 use App\Models\Cycle;
 use App\Models\Eleve;
 use App\Models\Enseignant;
+use App\Models\Evaluation;
 use App\Models\Frequente;
+use App\Models\EmploiDuTemps;
+use App\Models\Message;
 use App\Models\ModePaiement;
 use App\Models\Paiement;
 use App\Models\ParentEleve;
 use App\Models\Personne;
 use App\Models\Salle;
 use App\Models\Scolarite;
+use App\Models\SessionExamen;
 use App\Models\Tranche;
 use App\Models\Trimestre;
+use App\Models\User;
 use App\Models\VilleNaissance;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -103,6 +108,10 @@ class DemoDataSeeder extends Seeder
             ['Actif' => true]
         );
 
+        // Lier le compte auth enseignant à sa fiche Personne
+        User::where('email', 'enseignant@hnschool.test')
+            ->update(['idPers' => $persEns->idPers]);
+
         // Personne parent
         $persParent = Personne::firstOrCreate(
             ['username' => 'kouam.parent'],
@@ -164,5 +173,90 @@ class DemoDataSeeder extends Seeder
             ['matricule' => $eleves[1]->matricule, 'idAca' => $annee->idAnnee, 'commentaire' => 'Inscription'],
             ['montant' => 50000, 'idMode' => $orange->idMode, 'datePaie' => now()->subDays(15), 'operation_ID' => 'OM-DEMO-002']
         );
+
+        // Lier le compte auth parent à sa fiche Personne
+        User::where('email', 'parent@hnschool.test')
+            ->update(['idPers' => $persParent->idPers]);
+
+        // Messages démo admin → parent
+        Message::firstOrCreate(
+            ['idParent' => $persParent->idPers, 'objet' => 'Bienvenue à HN-School'],
+            [
+                'idExp_Pers'   => null,
+                'information'  => "Bonjour Mme Kouam,\n\nNous sommes ravis de vous accueillir dans l'espace parent de HN-School.\nVous pouvez consulter ici les notes, les absences et les paiements de vos enfants.\n\nCordialement,\nL'Administration",
+                'type_message' => 1,
+                'AnneeAcade'   => $annee->libelle,
+                'valider'      => false,
+            ]
+        );
+        Message::firstOrCreate(
+            ['idParent' => $persParent->idPers, 'objet' => 'Réunion de parents — Trimestre 1'],
+            [
+                'idExp_Pers'   => null,
+                'information'  => "Bonjour,\n\nNous vous convions à la réunion de parents du Trimestre 1 qui aura lieu le samedi 15 novembre 2025 à 9h00 dans la salle polyvalente.\n\nVotre présence est vivement souhaitée.\n\nCordialement,\nLa Direction",
+                'type_message' => 3,
+                'AnneeAcade'   => $annee->libelle,
+                'valider'      => false,
+            ]
+        );
+
+        // Lier le compte auth élève à Kouam Léa
+        User::where('email', 'eleve@hnschool.test')
+            ->update(['matricule' => $eleves[0]->matricule]);
+
+        // Emploi du temps démo pour CP1
+        $francais = Cours::where('libelle', 'Français')->where('idClasse', $cp->idClasse)->first();
+        $edtSlots = [
+            ['Lundi',    '07:30', $math],
+            ['Lundi',    '08:30', $francais],
+            ['Lundi',    '09:30', $math],
+            ['Mardi',    '07:30', $francais],
+            ['Mardi',    '08:30', $math],
+            ['Mardi',    '09:30', $francais],
+            ['Mercredi', '07:30', $math],
+            ['Mercredi', '08:30', $francais],
+            ['Jeudi',    '07:30', $francais],
+            ['Jeudi',    '08:30', $math],
+            ['Jeudi',    '09:30', $francais],
+            ['Vendredi', '07:30', $math],
+            ['Vendredi', '08:30', $francais],
+            ['Vendredi', '09:30', $math],
+        ];
+        foreach ($edtSlots as [$jour, $heure, $coursEdt]) {
+            if (!$coursEdt) continue;
+            EmploiDuTemps::firstOrCreate(
+                ['idClasse' => $cp->idClasse, 'jour' => $jour, 'heure' => $heure],
+                ['idCours' => $coursEdt->idCours, 'idAdmin' => 1]
+            );
+        }
+
+        // Session d'examen liée au Trimestre 1
+        $t1 = Trimestre::where('libelle', 'Trimestre 1')->where('idAcad', $annee->idAnnee)->first();
+        if ($t1) {
+            $session = SessionExamen::firstOrCreate(
+                ['libelle' => 'Examen T1', 'idTrimestre' => $t1->idTrimes],
+                ['description' => 'Évaluations du premier trimestre', 'idPers' => $persEns->idPers]
+            );
+
+            // Notes démo pour les 4 élèves CP1
+            $notesDemos = [
+                [$eleves[0], $math, 16.5, 'Très bon travail'],
+                [$eleves[0], Cours::where('libelle', 'Français')->first(), 14.0, 'Bon niveau'],
+                [$eleves[1], $math, 12.0, 'Peut mieux faire'],
+                [$eleves[1], Cours::where('libelle', 'Français')->first(), 15.5, 'Excellent'],
+                [$eleves[2], $math, 18.0, 'Félicitations'],
+                [$eleves[2], Cours::where('libelle', 'Français')->first(), 17.0, 'Très bien'],
+                [$eleves[3], $math, 9.5, 'Des efforts à fournir'],
+                [$eleves[3], Cours::where('libelle', 'Français')->first(), 11.0, 'Encourage'],
+            ];
+
+            foreach ($notesDemos as [$eleve, $cours, $note, $appr]) {
+                if (!$cours) continue;
+                Evaluation::firstOrCreate(
+                    ['matricule' => $eleve->matricule, 'idCours' => $cours->idCours, 'idSession' => $session->idSession],
+                    ['note' => $note, 'appreciation' => $appr, 'idPers' => $persEns->idPers]
+                );
+            }
+        }
     }
 }

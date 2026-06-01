@@ -1,4 +1,4 @@
-@props(['classe', 'cycles', 'action', 'method' => 'POST'])
+@props(['classe', 'cycles', 'action', 'method' => 'POST', 'cancelUrl' => null])
 
 <form method="POST" action="{{ $action }}" class="bg-white p-6 rounded-lg shadow-sm space-y-4 max-w-xl">
     @csrf
@@ -29,6 +29,6 @@
     </div>
     <div class="flex gap-3">
         <button class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Enregistrer</button>
-        <a href="{{ route('admin.classes.index') }}" class="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</a>
+        <a href="{{ $cancelUrl ?? route('admin.classes.index') }}" class="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</a>
     </div>
 </form>

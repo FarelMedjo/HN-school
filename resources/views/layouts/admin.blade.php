@@ -13,42 +13,77 @@
 <div class="min-h-screen flex">
 
     {{-- Sidebar --}}
-    <aside class="w-64 bg-slate-900 text-slate-100 flex flex-col">
-        <div class="px-6 py-5 border-b border-slate-800">
-            <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold tracking-tight">HN-School</a>
-            <div class="text-xs text-slate-400 mt-1">Espace administration</div>
+    <aside class="w-64 bg-blue-950 text-blue-50 flex flex-col">
+        <div class="px-6 py-5 border-b border-blue-900">
+            <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold tracking-tight text-white">HN-School</a>
+            <div class="text-xs text-blue-300 mt-1">Espace administration</div>
         </div>
 
-        <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+        <nav class="flex-1 px-3 py-4 space-y-1 text-sm overflow-y-auto">
             @php
-                $items = [
-                    ['Dashboard', 'admin.dashboard', 'home'],
-                    ['Années académiques', 'admin.annees.index', 'calendar'],
-                    ['Cycles', 'admin.cycles.index', 'layers'],
-                    ['Classes', 'admin.classes.index', 'school'],
-                    ['Salles', 'admin.salles.index', 'door'],
-                    ['Élèves', 'admin.eleves.index', 'users'],
-                    ['Enseignants', 'admin.enseignants.index', 'briefcase'],
-                    ['Parents', 'admin.parents.index', 'user-group'],
-                    ['Cours / Matières', 'admin.cours.index', 'book'],
-                    ['Paiements', 'admin.paiements.index', 'banknote'],
-                    ['Scolarités', 'admin.scolarites.index', 'tag'],
-                    ['Évaluations', 'admin.evaluations.index', 'pencil'],
+                $groups = [
+                    '' => [
+                        ['Dashboard', 'admin.dashboard'],
+                    ],
+                    'Structure' => [
+                        ['Années académiques', 'admin.annees.index'],
+                        ['Cycles', 'admin.cycles.index'],
+                        ['Classes', 'admin.classes.index'],
+                        ['Salles', 'admin.salles.index'],
+                    ],
+                    'Annuaire' => [
+                        ['Élèves', 'admin.eleves.index'],
+                        ['Enseignants', 'admin.enseignants.index'],
+                        ['Parents', 'admin.parents.index'],
+                    ],
+                    'Pédagogie' => [
+                        ['Cours / Matières', 'admin.cours.index'],
+                        ['Emploi du temps', 'admin.emploi-du-temps.index'],
+                        ['Évaluations', 'admin.evaluations.index'],
+                        ['Présences', 'admin.presences.index'],
+                        ['Bulletins', 'admin.bulletins.index'],
+                    ],
+                    'Vie scolaire' => [
+                        ['Convocations', 'admin.convocations.index'],
+                        ['Appréciations', 'admin.appreciations.index'],
+                        ['Journal / Remarques', 'admin.remarques.index'],
+                    ],
+                    'Finance' => [
+                        ['Paiements', 'admin.paiements.index'],
+                        ['Scolarités', 'admin.scolarites.index'],
+                    ],
+                    'Communication' => [
+                        ['Messages', 'admin.messages.index'],
+                    ],
+                    'Bibliothèque' => [
+                        ['Catalogue', 'admin.livres.index'],
+                        ['Emprunts', 'admin.emprunts.index'],
+                    ],
+                    'Administration' => [
+                        ['Utilisateurs & accès', 'admin.utilisateurs.index'],
+                        ['Établissement (cachet/signature)', 'admin.etablissement.edit'],
+                    ],
                 ];
             @endphp
-            @foreach ($items as [$label, $route, $icon])
-                @php $active = request()->routeIs($route) || request()->routeIs(str_replace('.index','.*', $route)); @endphp
-                <a href="{{ Route::has($route) ? route($route) : '#' }}"
-                   class="flex items-center gap-3 px-3 py-2 rounded-md transition
-                          {{ $active ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                    <span class="w-2 h-2 rounded-full {{ $active ? 'bg-emerald-400' : 'bg-slate-600' }}"></span>
-                    <span>{{ $label }}</span>
-                </a>
+            @foreach ($groups as $section => $items)
+                @if ($section !== '')
+                    <div class="pt-3 pb-1 px-3 text-xs font-semibold uppercase tracking-wider text-blue-500">{{ $section }}</div>
+                @endif
+                @foreach ($items as [$label, $route])
+                    @php $active = request()->routeIs($route) || request()->routeIs(str_replace('.index', '.*', $route)); @endphp
+                    <a href="{{ Route::has($route) ? route($route) : '#' }}"
+                       class="flex items-center gap-3 px-3 py-2 rounded-md transition
+                              {{ $active ? 'bg-blue-900 text-white' : 'text-blue-100 hover:bg-blue-900 hover:text-white' }}">
+                        <span class="w-2 h-2 rounded-full {{ $active ? 'bg-blue-400' : 'bg-blue-700' }}"></span>
+                        <span>{{ $label }}</span>
+                    </a>
+                @endforeach
             @endforeach
         </nav>
 
-        <div class="px-3 py-4 border-t border-slate-800">
-            <a href="{{ route('profile.edit') }}" class="block px-3 py-2 text-sm text-slate-300 hover:text-white">Mon profil</a>
+        <div class="px-3 py-4 border-t border-blue-900">
+            <div class="px-3 py-2 text-xs text-blue-300">{{ auth()->user()->name }}</div>
+            <a href="{{ route('profile.edit') }}" class="block px-3 py-2 text-sm text-blue-100 hover:text-white">Mon profil</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button class="w-full text-left px-3 py-2 text-sm text-rose-300 hover:text-rose-200">
@@ -72,7 +107,7 @@
                 <div class="text-sm text-gray-600">
                     <span class="font-medium">{{ auth()->user()->name }}</span>
                     <span class="text-gray-400 mx-2">·</span>
-                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">Admin</span>
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">Admin</span>
                 </div>
             </div>
         </header>
@@ -80,6 +115,11 @@
         @if (session('success'))
             <div class="mx-6 mt-4 px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded">
                 {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="mx-6 mt-4 px-4 py-3 bg-rose-50 border border-rose-200 text-rose-800 rounded">
+                {{ session('error') }}
             </div>
         @endif
         @if ($errors->any())
